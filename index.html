@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>本を棚に戻すゲーム</title>
+<meta name="description" content="友達と部屋番号でつながって、床に散らばった本を正しい棚に戻すマルチプレイ協力3Dゲーム。誰でも入れる公開ルームもあり。" />
+<link rel="canonical" href="https://kaikomziu.github.io/book-shelf-party/" />
+<meta property="og:title" content="本を棚に戻すゲーム" />
+<meta property="og:description" content="友達と部屋番号でつながって、床に散らばった本を正しい棚に戻すマルチプレイ協力3Dゲーム。" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://kaikomziu.github.io/book-shelf-party/" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<div id="lobby" class="screen">
+  <div class="lobby-card">
+    <h1>📚 本を棚に戻すゲーム</h1>
+    <p class="sub">床に散らばった本を、友達と一緒に正しい棚へ戻そう。</p>
+
+    <label>
+      なまえ
+      <input id="nameInput" type="text" maxlength="16" placeholder="たろう" autocomplete="off" />
+    </label>
+
+    <button id="publicBtn" class="secondary">🌍 みんなの公開部屋に入る</button>
+    <p class="hint small">誰でも自由に出入りできる共有ルームです（1000冊）。</p>
+
+    <div class="divider"><span>または部屋番号で</span></div>
+
+    <label>
+      部屋番号
+      <input id="codeInput" type="text" maxlength="16" placeholder="例: ABCD" autocomplete="off" />
+    </label>
+
+    <div class="book-count">
+      <span class="label">本の冊数（新規作成時のみ）</span>
+      <div class="radio-row" id="bookCountRow">
+        <label class="radio"><input type="radio" name="bookCount" value="500" checked /> 500冊</label>
+        <label class="radio"><input type="radio" name="bookCount" value="1000" /> 1000冊</label>
+        <label class="radio"><input type="radio" name="bookCount" value="2000" /> 2000冊</label>
+      </div>
+      <p class="hint small">既にある部屋番号ならこの選択は無視され、最初に作られた時の冊数が使われます。</p>
+    </div>
+
+    <button id="joinBtn">入室する</button>
+    <p class="hint">同じ部屋番号を入力した人同士でつながります。存在しない番号を入れると新しい部屋が作られます。</p>
+    <p id="lobbyError" class="error"></p>
+  </div>
+</div>
+
+<div id="gameUi" class="screen hidden">
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="hud">
+    <div id="roomBadge"></div>
+    <div id="progressWrap">
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div id="progressText">0 / 0 冊</div>
+    </div>
+    <div id="playerList"></div>
+  </div>
+
+  <div id="prompt" class="hidden"></div>
+
+  <button id="interactBtn">つかむ / おく<br /><span>(Eキー)</span></button>
+
+  <div id="controlsHint">
+    W/S: 前進・後退&nbsp;&nbsp;A/D: 回転&nbsp;&nbsp;E: つかむ・おく
+  </div>
+</div>
+
+<div id="winOverlay" class="screen hidden">
+  <div class="lobby-card">
+    <h1>🎉 クリア！</h1>
+    <p class="sub" id="winText">みんなですべての本を本棚に戻しました！</p>
+    <button id="closeWinBtn">閉じる</button>
+  </div>
+</div>
+
+<script type="module" src="/js/main.js"></script>
+</body>
+</html>
