@@ -292,13 +292,22 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
     return bestId;
   }
 
+  let interacting = false;
   async function tryInteract() {
-    if (localHeldBookId == null) {
-      const bookId = nearestFloorBookId();
-      if (bookId == null) return;
-      await net.pickupBook(roomCode, bookId, myId);
-    } else {
-      await net.placeBook(roomCode, localHeldBookId, myId);
+    // 連打・連続タップで同時に2冊拾ってしまわないようにする
+    // (RealtimeでlocalHeldBookIdが更新されるまでには少しラグがあるため)
+    if (interacting) return;
+    interacting = true;
+    try {
+      if (localHeldBookId == null) {
+        const bookId = nearestFloorBookId();
+        if (bookId == null) return;
+        await net.pickupBook(roomCode, bookId, myId);
+      } else {
+        await net.placeBook(roomCode, localHeldBookId, myId);
+      }
+    } finally {
+      interacting = false;
     }
   }
 

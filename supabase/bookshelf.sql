@@ -46,9 +46,14 @@ set search_path = public
 as $$
 declare
   result integer;
+  safe_total integer;
 begin
+  -- クライアントを介さずRPCを直接叩かれても、想定外の冊数(0や巨大な値)で
+  -- 部屋が作られてしまわないように許可された値だけに制限する。
+  safe_total := case when p_total in (500, 1000, 2000) then p_total else 500 end;
+
   insert into public.bookshelf_rooms (room_code, total_books)
-  values (p_room, p_total)
+  values (p_room, safe_total)
   on conflict (room_code) do nothing;
 
   select total_books into result from public.bookshelf_rooms where room_code = p_room;

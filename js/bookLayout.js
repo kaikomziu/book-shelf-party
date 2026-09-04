@@ -41,7 +41,13 @@ function hashSeed(str) {
 }
 
 export function normalizeRoomCode(code) {
-  return String(code || "").trim().toUpperCase().slice(0, 16);
+  // Supabase Realtimeのfilter文字列やチャンネル名に安全な文字だけを残す
+  // (英数字のみ。日本語や記号は入れても伝わらないので弾く)
+  return String(code || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 16);
 }
 
 export function sanitizeTotalBooks(n) {
