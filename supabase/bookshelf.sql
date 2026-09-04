@@ -33,8 +33,15 @@ drop policy if exists "bookshelf_book_state_select" on public.bookshelf_book_sta
 create policy "bookshelf_book_state_select" on public.bookshelf_book_state
   for select using (true);
 
--- Realtime配信対象に追加(これを忘れるとpostgres_changesが無音になる)
-alter publication supabase_realtime add table public.bookshelf_book_state;
+-- Realtime配信対象に追加(これを忘れるとpostgres_changesが無音になる)。
+-- 既に登録済みだと ALTER PUBLICATION は素直に失敗する(再実行できない)ので、
+-- 二重登録エラーだけ無視して何度でも安全に実行できるようにする。
+do $$
+begin
+  alter publication supabase_realtime add table public.bookshelf_book_state;
+exception when duplicate_object then
+  null;
+end $$;
 
 -- 部屋を取得、無ければ指定の冊数で新規作成する。
 -- 既に存在する場合は既存の冊数を返す(先着優先、以後その部屋の冊数は変わらない)。
