@@ -55,6 +55,10 @@ export class LocalPlayerController {
 
     const rotatedOffset = this.cameraOffset.clone().applyEuler(new THREE.Euler(0, this.group.rotation.y, 0));
     const desiredCamPos = this.group.position.clone().add(rotatedOffset);
+    // カメラが壁の外側に出て自キャラが壁の裏に隠れてしまわないよう、
+    // プレイヤーの可動域と同じ範囲にカメラ位置もクランプする。
+    desiredCamPos.x = clamp(desiredCamPos.x, this.bounds.xMin, this.bounds.xMax);
+    desiredCamPos.z = clamp(desiredCamPos.z, this.bounds.zMin, this.bounds.zMax);
     const followT = 1 - Math.pow(0.0001, dt);
     this._camPos.lerp(desiredCamPos, followT);
     this.camera.position.copy(this._camPos);

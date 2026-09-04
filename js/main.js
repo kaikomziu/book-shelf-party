@@ -1,20 +1,8 @@
-function __diag(msg) {
-  try {
-    if (window.__diagPush) window.__diagPush("[main.js] " + msg + " " + performance.now().toFixed(1));
-  } catch (_) {}
-}
-__diag("top of module, before imports");
-
 import * as THREE from "https://esm.sh/three@0.160.0";
-__diag("imported three");
 import { buildEnvironment, BooksRenderer, createHomeGlow, createPlayerMesh, handWorldPosition } from "./scene.js";
-__diag("imported scene.js");
 import { LocalPlayerController } from "./player.js";
-__diag("imported player.js");
 import * as net from "./net.js";
-__diag("imported net.js");
 import { createDefaultBooksForRoom, normalizeRoomCode, sanitizeTotalBooks } from "./bookLayout.js";
-__diag("imported bookLayout.js");
 
 const PICKUP_RADIUS = 2.4;
 const PLACE_RADIUS = 1.6;
@@ -46,16 +34,12 @@ const el = {
   closeWinBtn: document.getElementById("closeWinBtn"),
 };
 
-__diag("el object built, publicBtn=" + (el.publicBtn ? "found" : "NULL") + " joinBtn=" + (el.joinBtn ? "found" : "NULL"));
-
 restoreLastInputs();
-__diag("restoreLastInputs done");
-el.joinBtn.addEventListener("click", () => { __diag("joinBtn click handler fired"); handleJoin(el.codeInput.value); });
-el.publicBtn.addEventListener("click", () => { __diag("publicBtn click handler fired"); handleJoin(PUBLIC_ROOM_CODE); });
+el.joinBtn.addEventListener("click", () => handleJoin(el.codeInput.value));
+el.publicBtn.addEventListener("click", () => handleJoin(PUBLIC_ROOM_CODE));
 el.codeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleJoin(el.codeInput.value); });
 el.nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleJoin(el.codeInput.value); });
 el.closeWinBtn.addEventListener("click", () => el.winOverlay.classList.add("hidden"));
-__diag("all listeners attached, module top-level complete");
 
 function restoreLastInputs() {
   try {
@@ -172,13 +156,14 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
     const color = meta.color || pickColor(id);
     const group = createPlayerMesh(color, meta.name || "");
     const startX = meta.x != null ? meta.x : (Math.random() - 0.5) * 3;
-    const startZ = meta.z != null ? meta.z : layout.BOUNDS.zMax - 1.5;
+    const startZ = meta.z != null ? meta.z : layout.BOUNDS.zMax - 7;
+    const startRotY = meta.rotationY != null ? meta.rotationY : Math.PI;
     group.position.set(startX, 0, startZ);
-    group.rotation.y = meta.rotationY || Math.PI;
+    group.rotation.y = startRotY;
     scene.add(group);
     const entry = {
       group,
-      target: { x: startX, z: startZ, rotationY: meta.rotationY || Math.PI },
+      target: { x: startX, z: startZ, rotationY: startRotY },
       isLocal,
       color,
       name: meta.name || "名無し",
@@ -188,7 +173,7 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
     return entry;
   }
 
-  const localMeta = { name, color: pickColor(myId), x: (Math.random() - 0.5) * 3, z: layout.BOUNDS.zMax - 1.5, rotationY: Math.PI };
+  const localMeta = { name, color: pickColor(myId), x: (Math.random() - 0.5) * 3, z: layout.BOUNDS.zMax - 7, rotationY: Math.PI };
   const me = spawnPlayer(myId, localMeta, true);
   const localController = new LocalPlayerController(camera, me.group, layout.BOUNDS);
 
@@ -374,6 +359,8 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
 
   const clock = new THREE.Clock();
   let moveSendTimer = 0;
+  let presenceSyncTimer = 0;
+  const PRESENCE_SYNC_INTERVAL = 2.5; // 秒(遅れて入室した人にも大体の位置が見えるように)
 
   function animate() {
     requestAnimationFrame(animate);
@@ -386,6 +373,19 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
     if (moved && moveSendTimer >= MOVE_SEND_INTERVAL) {
       moveSendTimer = 0;
       live.sendMove({ x: me.group.position.x, z: me.group.position.z }, me.group.rotation.y);
+    }
+
+    // presenceのメタ情報(遅れて入室した人が最初に見る位置)も定期的に更新しておく
+    presenceSyncTimer += dt;
+    if (presenceSyncTimer >= PRESENCE_SYNC_INTERVAL) {
+      presenceSyncTimer = 0;
+      live.updatePresence({
+        name,
+        color: me.color,
+        x: me.group.position.x,
+        z: me.group.position.z,
+        rotationY: me.group.rotation.y,
+      });
     }
 
     for (const [id, p] of players) {

@@ -79,31 +79,6 @@
   </div>
 </div>
 
-<pre id="__diag" style="position:fixed;top:0;left:0;z-index:99999;background:#000;color:#0f0;font-size:11px;padding:6px;max-width:100vw;max-height:40vh;overflow:auto;white-space:pre-wrap;"></pre>
-<script>
-  window.__diagLog = [];
-  function __diagPush(msg) {
-    window.__diagLog.push(msg);
-    var el = document.getElementById('__diag');
-    if (el) el.textContent = window.__diagLog.join('\n');
-  }
-  __diagPush('[diag] inline script start ' + performance.now().toFixed(1));
-  window.addEventListener('error', function (e) {
-    __diagPush('[diag] window error: ' + e.message + ' @ ' + e.filename + ':' + e.lineno + ':' + e.colno);
-  });
-  window.addEventListener('unhandledrejection', function (e) {
-    __diagPush('[diag] unhandled rejection: ' + (e.reason && (e.reason.stack || e.reason.message || e.reason)));
-  });
-  document.addEventListener('DOMContentLoaded', function () {
-    __diagPush('[diag] DOMContentLoaded ' + performance.now().toFixed(1));
-  });
-  window.addEventListener('load', function () {
-    __diagPush('[diag] window load ' + performance.now().toFixed(1));
-  });
-</script>
 <script type="module" src="js/main.js"></script>
-<script type="module">
-  __diagPush('[diag] module script tag reached ' + performance.now().toFixed(1));
-</script>
 </body>
 </html>
