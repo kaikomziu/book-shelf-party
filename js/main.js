@@ -1,8 +1,20 @@
+function __diag(msg) {
+  try {
+    if (window.__diagPush) window.__diagPush("[main.js] " + msg + " " + performance.now().toFixed(1));
+  } catch (_) {}
+}
+__diag("top of module, before imports");
+
 import * as THREE from "https://esm.sh/three@0.160.0";
+__diag("imported three");
 import { buildEnvironment, BooksRenderer, createHomeGlow, createPlayerMesh, handWorldPosition } from "./scene.js";
+__diag("imported scene.js");
 import { LocalPlayerController } from "./player.js";
+__diag("imported player.js");
 import * as net from "./net.js";
+__diag("imported net.js");
 import { createDefaultBooksForRoom, normalizeRoomCode, sanitizeTotalBooks } from "./bookLayout.js";
+__diag("imported bookLayout.js");
 
 const PICKUP_RADIUS = 2.4;
 const PLACE_RADIUS = 1.6;
@@ -34,12 +46,16 @@ const el = {
   closeWinBtn: document.getElementById("closeWinBtn"),
 };
 
+__diag("el object built, publicBtn=" + (el.publicBtn ? "found" : "NULL") + " joinBtn=" + (el.joinBtn ? "found" : "NULL"));
+
 restoreLastInputs();
-el.joinBtn.addEventListener("click", () => handleJoin(el.codeInput.value));
-el.publicBtn.addEventListener("click", () => handleJoin(PUBLIC_ROOM_CODE));
+__diag("restoreLastInputs done");
+el.joinBtn.addEventListener("click", () => { __diag("joinBtn click handler fired"); handleJoin(el.codeInput.value); });
+el.publicBtn.addEventListener("click", () => { __diag("publicBtn click handler fired"); handleJoin(PUBLIC_ROOM_CODE); });
 el.codeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleJoin(el.codeInput.value); });
 el.nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleJoin(el.codeInput.value); });
 el.closeWinBtn.addEventListener("click", () => el.winOverlay.classList.add("hidden"));
+__diag("all listeners attached, module top-level complete");
 
 function restoreLastInputs() {
   try {
