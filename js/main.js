@@ -419,4 +419,6 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
     renderer.render(scene, camera);
   }
   animate();
+
+  window.__debug = { scene, camera, renderer, me, players, layout, booksById };
 }
