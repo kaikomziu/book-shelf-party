@@ -53,8 +53,11 @@ export class LocalPlayerController {
       minZ: bc.z - hd, maxZ: bc.z + hd,
     }));
 
-    this.cameraOffset = new THREE.Vector3(0, 3.4, -5.6);
-    this.cameraLookOffset = new THREE.Vector3(0, 1.2, 0);
+    // 本棚の通路の奥行き(ROW_SPACING=6.5からケース厚み0.6を引いた約5.9)に対して
+    // 後方5.6ユニットは余裕が無さすぎ、衝突回避が働いてもカメラが棚のすぐ手前に
+    // 張り付いて近すぎる(=見えづらい)ままになっていた。距離を縮めて余裕を持たせる。
+    this.cameraOffset = new THREE.Vector3(0, 2.6, -4.0);
+    this.cameraLookOffset = new THREE.Vector3(0, 1.1, 0);
     this._camPos = camera.position.clone();
 
     window.addEventListener("keydown", (e) => {
