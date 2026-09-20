@@ -175,7 +175,7 @@ async function startGame({ myId, roomCode, name, totalBooks }) {
 
   const localMeta = { name, color: pickColor(myId), x: (Math.random() - 0.5) * 3, z: layout.BOUNDS.zMax - 7, rotationY: Math.PI };
   const me = spawnPlayer(myId, localMeta, true);
-  const localController = new LocalPlayerController(camera, me.group, layout.BOUNDS);
+  const localController = new LocalPlayerController(camera, me.group, layout);
 
   let localHeldBookId = heldByPlayer.get(myId) ?? null;
 

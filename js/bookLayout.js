@@ -82,6 +82,7 @@ export function getLayoutConfig(totalBooks) {
     zMin: zMin + 1.0,
     zMax: zMax - 0.7,
   };
+  const CASE_HEIGHT = SHELF_Y_START + (SHELVES_PER_CASE - 1) * SHELF_Y_STEP + 0.65;
 
   return {
     ROOM,
@@ -89,6 +90,7 @@ export function getLayoutConfig(totalBooks) {
     BOUNDS,
     CASE_WIDTH,
     CASE_DEPTH,
+    CASE_HEIGHT,
     SHELVES_PER_CASE,
     SLOTS_PER_SHELF,
     SHELF_Y_START,

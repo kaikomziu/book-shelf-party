@@ -1,7 +1,7 @@
 import * as THREE from "https://esm.sh/three@0.160.0";
 
 export function buildEnvironment(scene, layout) {
-  const { ROOM, BOOKCASES, CASE_WIDTH, CASE_DEPTH, SHELVES_PER_CASE, SHELF_Y_START, SHELF_Y_STEP } = layout;
+  const { ROOM, BOOKCASES, CASE_WIDTH, CASE_DEPTH, CASE_HEIGHT, SHELVES_PER_CASE, SHELF_Y_START, SHELF_Y_STEP } = layout;
   const depth = ROOM.zMax - ROOM.zMin;
   const centerZ = (ROOM.zMax + ROOM.zMin) / 2;
 
@@ -33,7 +33,7 @@ export function buildEnvironment(scene, layout) {
   addWall(ROOM.width / 2 + wallThickness / 2, centerZ, wallThickness, depth);
 
   const caseMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2f, roughness: 0.85 });
-  const caseHeight = SHELF_Y_START + (SHELVES_PER_CASE - 1) * SHELF_Y_STEP + 0.65;
+  const caseHeight = CASE_HEIGHT;
   for (const bc of BOOKCASES) {
     const back = new THREE.Mesh(new THREE.BoxGeometry(CASE_WIDTH, caseHeight, CASE_DEPTH), caseMat);
     back.position.set(bc.x, caseHeight / 2, bc.z);
